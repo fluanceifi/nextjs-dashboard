@@ -62,7 +62,7 @@ export async function fetchCardData() {
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
 
-    const data = await Promise.all([
+    const data = await Promise.all([ //모든 프로미스를 동시에 사용하는 병렬 처리 기법... -> 근데 특정 데이터 요청이 느려지면? 다같이 보틀넥되나?
       invoiceCountPromise,
       customerCountPromise,
       invoiceStatusPromise,
@@ -159,7 +159,8 @@ export async function fetchInvoiceById(id: string) {
       // Convert amount from cents to dollars
       amount: invoice.amount / 100,
     }));
-
+    console.log(invoice);
+    
     return invoice[0];
   } catch (error) {
     console.error('Database Error:', error);
