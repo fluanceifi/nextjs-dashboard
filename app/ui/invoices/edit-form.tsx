@@ -9,7 +9,8 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { updateInvoice } from '@/app/lib/actions';
+import { updateInvoice, State } from '@/app/lib/actions'; // [수정 1] State 타입 import 추가
+import { useActionState } from 'react'; // [수정 2] 훅 import 추가
 
 export default function EditInvoiceForm({
   invoice,
@@ -18,9 +19,14 @@ export default function EditInvoiceForm({
   invoice: InvoiceForm;
   customers: CustomerField[];
 }) {
-  const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);  
+  // [수정 3] useActionState 훅 연결
+  const initialState: State = { message: null, errors: {} };
+  const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
+  const [state, formAction] = useActionState(updateInvoiceWithId, initialState);
+
   return (
-    <form action={updateInvoiceWithId}>
+    // [수정 4] action에 formAction 변수 연결
+    <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
@@ -108,6 +114,14 @@ export default function EditInvoiceForm({
                 </label>
               </div>
             </div>
+          </div>
+          {/* 에러 메시지 표시 영역 (선택사항) */}
+          <div id="status-error" aria-live="polite" aria-atomic="true">
+            {state.message && (
+              <p className="mt-2 text-sm text-red-500" key={state.message}>
+                {state.message}
+              </p>
+            )}
           </div>
         </fieldset>
       </div>
